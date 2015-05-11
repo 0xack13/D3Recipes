@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+        <head>
+                <meta charset="utf-8">
+                <title>D3: Setting div heights from data</title>
+                <script type="text/javascript" src="../d3/d3.v3.js"></script>
+                <style type="text/css">
+                
+                        div.bar {
+                                display: inline-block;
+                                width: 20px;
+                                height: 75px;        /* Gets overriden by D3-assigned height below */
+                                background-color: teal;
+                                margin-right: 2px;
+                        }
+                
+                </style>
+        </head>
+        <body>
+                <script type="text/javascript">
+
+                        d3.csv("food.csv", function(data) { 
+                                console.log(data);
+                                dataset = data; //Once loaded, copy to dataset.
+                                generateVis(); //Then call other functions that
+                                hideLoadingMsg(); //depend on data being present.
+                        });
+                
+                        // var dataset = [ 5, 10, 15, 20, 55 ];
+                        var dataset=[25,7,5,26,11,8,25,14,23,19, 14, 11, 22, 29, 11, 13, 12, 17, 18, 10, 24,18,25,9,3];
+                        d3.select("body").selectAll("div")
+                                .data(dataset)
+                                .enter()
+                                .append("div")
+                                .attr("class", "bar")
+                                .style("height", function(d) {
+                                        var barHeight = d * 5; //Scale up by factor of 5 return barHeight + "px";
+                                        return barHeight + "px";
+                                });
+                </script>
+        </body>
+</html>

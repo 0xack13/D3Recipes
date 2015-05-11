@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Bar Chart</title>
+    <meta charset="utf-8">
+    <script src="../d3/d3.v3.min.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./d3/d3.csv.js" charset="utf-8"></script>
+    <style type="text/css">
+ 
+        body {
+          font: 20px sans-serif;
+        }
+         
+        .bar rect {
+          fill: steelblue;
+        }
+         
+        .bar text.value {
+          fill: white;
+          font-size: 20px
+        }
+         
+        .axis {
+          shape-rendering: crispEdges;
+        }
+         
+        .axis path {
+          fill: none;
+        }
+         
+        .x.axis line {
+          stroke: #fff;
+          stroke-opacity: .8;
+        }
+         
+        .y.axis path {
+          stroke: black;
+        }
+ 
+    </style>
+  </head>
+  <body>
+    <center>News Bar Chart</center>
+    <script type="text/javascript">
+ 
+var m = [100, 10, 10, 30],
+    w = 760 - m[1] - m[3],
+    h = 330 - m[0] - m[2];
+ 
+var format = d3.format(",.0f");
+ 
+var x = d3.scale.linear().range([0, w]),
+    y = d3.scale.ordinal().rangeRoundBands([0, h], .1);
+ 
+var xAxis = d3.svg.axis().scale(x).orient("top").tickSize(-h),
+    yAxis = d3.svg.axis().scale(y).orient("left").tickSize(0);
+ 
+var svg = d3.select("body").append("svg")
+    .attr("width", w + m[1] + m[3])
+    .attr("height", h + m[0] + m[2])
+    .append("g")
+    .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
+ 
+d3.csv("myinfo.csv", function(data) {
+ 
+  // Parse numbers, and sort by value.
+  data.forEach(function(d) { 
+    console.log(d);
+    // "+" Sign indicates that the numbers are parsed as positive numerics
+    d.tid = +d.tid;
+  });
+  data.sort(function(a, b) { 
+    // Sort implemented by using this way of comparison (Ascending)
+    console.log(a.tid + " " + b.tid)
+    return b.tid - a.tid;
+  });
+ 
+  // Set the scale domain.
+  //Populate the Y axis with the mapped text values e.g. Section Links
+  x.domain([0, d3.max(data, function(d) { return d.tid; })]);
+  //Populate the Y axis with the mapped text values e.g. Section Links
+  y.domain(data.map(function(d) { return d.sectionLink; }));
+ 
+  var bar = svg.selectAll("g.bar")
+      .data(data)
+      .enter().append("g")
+      .attr("class", "bar")
+      //Translate the bar graph in to either vertical or horizontal dimension. In either case you choose the x(t.tid) in the transform/translate function, the graph will be a VERTICAL bar chart. Otherwise, by choosing the y(d.tid), the diagram will be set horizontally.
+      .attr("transform", function(d) { return "translate(0," + y(d.sectionLink) + ")"; });
+ 
+  bar.append("rect")
+      .attr("width", function(d) { return x(d.tid); })
+      .attr("height", y.rangeBand());
+ 
+  bar.append("text")
+      //Look at the css part and grab the style of the text. Bold, green or whatever!
+      .attr("class", "value")
+      //Values are being written and added to the bar chart as numbers per occurence.
+      .attr("x", function(d) { return x(d.tid); })
+      .attr("y", y.rangeBand() / 2)
+      //The label will be placed before the end of each bar by 3px
+      .attr("dx", -3)
+      //dy signifies the position in the y space "dimension if you know what I mean!"
+      .attr("dy", "0.2em")
+      // We mentioned that the label will be placed at the end, why? See below! :)
+      .attr("text-anchor", "end") // You can you middle by the way
+      .text(function(d) { return format(d.tid); });
+
+ 
+  svg.append("g")
+      .attr("class", "x axis")
+      .call(xAxis);
+ 
+  svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis);
+});
+ 
+    </script>
+  </body>
+</html>
